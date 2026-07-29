@@ -13,6 +13,8 @@ jobs:
 
       - name: Checkout Git from PR cptpcrd for RBR50v2 Device Tree
         run: |
+          git clone --single-branch --branch openwrt-25.12 https://github.com/openwrt/openwrt.git
+          cd openwrt
           git fetch origin pull/22321/head:pr-22321
           git checkout pr-22321
       - name: Install Dependencies
