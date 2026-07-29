@@ -26,6 +26,7 @@ jobs:
 
       - name: Update & Install Feeds
         run: |
+          cd openwrt
           ./scripts/feeds update -a
           ./scripts/feeds install -a
 
@@ -36,36 +37,27 @@ jobs:
           key: ${{ runner.os }}-ccache-${{ github.sha }}
           restore-keys: |
             ${{ runner.os }}-ccache-
-     
+      
+      - name: Configure ccache Environment
+        run: |
+          echo "export CCACHE_DIR=$HOME/.ccache" >> $GITHUB_ENV
+          echo "export CCACHE_MAXSIZE=8G" >> $GITHUB_ENV
+          ccache -M 8G
       - name: Configure Target
         run: |
-          cat << 'EOF' > .config
-          CONFIG_TARGET_ipq40xx=y
-          CONFIG_TARGET_ipq40xx_generic=y
-          CONFIG_TARGET_ipq40xx_generic_DEVICE_netgear_rbr50-v2=y
-          CONFIG_TARGET_ROOTFS_INITRAMFS=y
-          CONFIG_TARGET_INITRAMFS_COMPRESSION_NONE=y
-          CONFIG_TARGET_ROOTFS_SQUASHFS=y
-          CONFIG_TARGET_SQUASHFS_BLOCK_SIZE=256
-          CONFIG_TARGET_SQUASHFS_BLOCK_READERS=4
-          CONFIG_TARGET_SQUASHFS_SMALL_READERS=4
-          CONFIG_TARGET_UBIFS_FREE_SPACE_FIXUP=y
-          CONFIG_TARGET_UBIFS_JOURNAL_SIZE=""
-          CONFIG_DEVEL=y
-          CONFIG_CCACHE=y
-          EOF
+          cd openwrt
           make defconfig
 
       - name: Download Sources
-        run: make download -j4
+        run: cd openwrt && make download -j4
 
       - name: Compile Firmware
-        run: make -j$(nproc)
+        run: cd openwrt && make -j$(nproc)
 
 
       - name: Upload Firmware Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: openwrt-ipq40xx-generic-full-build
-          path: bin/targets/ipq40xx/generic/
+          path: openwrt/bin/targets/ipq40xx/generic/
           if-no-files-found: error
