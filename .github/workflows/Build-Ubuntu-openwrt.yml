@@ -9,7 +9,12 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+        
 
+      - name: Checkout Git from PR cptpcrd for RBR50v2 Device Tree
+        run: |
+          git fetch origin pull/22321/head:pr-22321
+          git checkout pr-22321
       - name: Install Dependencies
         run: |
           sudo apt-get update
