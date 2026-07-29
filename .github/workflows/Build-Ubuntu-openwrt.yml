@@ -39,7 +39,22 @@ jobs:
      
       - name: Configure Target
         run: |
-          make oldconfig
+          cat << 'EOF' > .config
+          CONFIG_TARGET_ipq40xx=y
+          CONFIG_TARGET_ipq40xx_generic=y
+          CONFIG_TARGET_ipq40xx_generic_DEVICE_netgear_rbr50-v2=y
+          CONFIG_TARGET_ROOTFS_INITRAMFS=y
+          CONFIG_TARGET_INITRAMFS_COMPRESSION_NONE=y
+          CONFIG_TARGET_ROOTFS_SQUASHFS=y
+          CONFIG_TARGET_SQUASHFS_BLOCK_SIZE=256
+          CONFIG_TARGET_SQUASHFS_BLOCK_READERS=4
+          CONFIG_TARGET_SQUASHFS_SMALL_READERS=4
+          CONFIG_TARGET_UBIFS_FREE_SPACE_FIXUP=y
+          CONFIG_TARGET_UBIFS_JOURNAL_SIZE=""
+          CONFIG_DEVEL=y
+          CONFIG_CCACHE=y
+          EOF
+          make defconfig
 
       - name: Download Sources
         run: make download -j4
