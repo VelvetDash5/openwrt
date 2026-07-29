@@ -35,12 +35,16 @@ jobs:
           key: ${{ runner.os }}-ccache-${{ github.sha }}
           restore-keys: |
             ${{ runner.os }}-ccache-
-
-      - name: Configure Target (ipq40xx / RBR50v2)
+     
+      - name: Configure Target
         run: |
-          echo "CONFIG_TARGET_ipq40xx=y" > .config
-          echo "CONFIG_TARGET_ipq40xx_generic=y" >> .config
-          echo "CONFIG_TARGET_DEVICE_ipq40xx_generic_DEVICE_netgear_rbr50-v2=y" >> .config
+          cat << 'EOF' > .config
+          CONFIG_TARGET_ipq40xx=y
+          CONFIG_TARGET_ipq40xx_generic=y
+          CONFIG_TARGET_ipq40xx_generic_DEVICE_netgear_rbr50-v2=y
+          CONFIG_DEVEL=y
+          CONFIG_CCACHE=y
+          EOF
           make defconfig
 
       - name: Download Sources
