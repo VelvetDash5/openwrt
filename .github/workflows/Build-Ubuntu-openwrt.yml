@@ -64,8 +64,8 @@ jobs:
 
       - name: Compile Firmware
         env:
-            CCACHE_DIR: ${{ github.workspace }}/openwrt/.ccache
-          run: cd openwrt && make -j$(nproc)
+          CCACHE_DIR: ${{ github.workspace }}/openwrt/.ccache
+        run: cd openwrt && make -j$(nproc)
 
 
       - name: Upload Firmware Artifacts
