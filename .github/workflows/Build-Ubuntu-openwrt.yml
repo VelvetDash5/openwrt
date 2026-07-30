@@ -51,15 +51,21 @@ jobs:
     
       
       - name: Configure Target
+        env:
+            CCACHE_DIR: ${{ github.workspace }}/openwrt/.ccache
         run: |
           cd openwrt
           make defconfig
 
       - name: Download Sources
+        env:
+            CCACHE_DIR: ${{ github.workspace }}/openwrt/.ccache
         run: cd openwrt && make download -j4
 
       - name: Compile Firmware
-        run: cd openwrt && make -j$(nproc)
+        env:
+            CCACHE_DIR: ${{ github.workspace }}/openwrt/.ccache
+          run: cd openwrt && make -j$(nproc)
 
 
       - name: Upload Firmware Artifacts
