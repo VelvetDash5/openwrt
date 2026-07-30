@@ -34,6 +34,9 @@ jobs:
           ./scripts/feeds update -a
           ./scripts/feeds install -a
 
+      - name: Create ccache directory
+        run: |
+              mkdir -p ~/.ccache
       - name: Setup ccache
         run: |
          mkdir -p $CCACHE_DIR
