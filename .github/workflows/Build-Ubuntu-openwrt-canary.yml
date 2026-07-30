@@ -1,4 +1,4 @@
-name: Build RBR50v2 Firmware
+name: Build RBR50v2 Firmware Canary
 
 
 on:
