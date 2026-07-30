@@ -6,6 +6,11 @@ CONFIG_TARGET_ROOTFS_SQUASHFS=y
 # CONFIG_TARGET_MULTI_PROFILE is not set
 CONFIG_DEVEL=y
 CONFIG_CCACHE=y
+# Disable Candela Technologies (CT) packages
+# CONFIG_PACKAGE_kmod-ath10k-ct is not set
+# CONFIG_PACKAGE_ath10k-firmware-qca9984-ct is not set
+
+# Enable Standard ath10k Driver & Firmware
 CONFIG_PACKAGE_kmod-ath10k=y
 CONFIG_PACKAGE_kmod-ath10k-pci=y
 CONFIG_PACKAGE_ath10k-firmware-qca9984=y
