@@ -1,11 +1,15 @@
 name: Build RBR50v2 Firmware
 
+
 on:
   workflow_dispatch: # Allows you to manually trigger it from the Actions tab
+
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+        CCACHE_DIR: ${{ github.workspace }}/.ccache
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -30,19 +34,19 @@ jobs:
           ./scripts/feeds update -a
           ./scripts/feeds install -a
 
-      - name: Restore ccache
+      - name: Setup ccache
+        run: |
+         mkdir -p $CCACHE_DIR
+         ccache -M 8G  # Set max size
+      - name: Cache ccache
         uses: actions/cache@v4
         with:
-          path: ~/.ccache
-          key: ${{ runner.os }}-ccache-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-ccache-
+         path: ${{ github.workspace }}/.ccache
+         key: ${{ runner.os }}-ccache-${{ github.sha }}
+         restore-keys: |
+          ${{ runner.os }}-ccache-
+    
       
-      - name: Configure ccache Environment
-        run: |
-          echo "export CCACHE_DIR=$HOME/.ccache" >> $GITHUB_ENV
-          echo "export CCACHE_MAXSIZE=8G" >> $GITHUB_ENV
-          ccache -M 8G
       - name: Configure Target
         run: |
           cd openwrt
