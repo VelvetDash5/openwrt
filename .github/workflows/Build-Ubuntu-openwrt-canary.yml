@@ -1,0 +1,76 @@
+name: Build RBR50v2 Firmware
+
+
+on:
+  workflow_dispatch: # Allows you to manually trigger it from the Actions tab
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+        CCACHE_DIR: ${{ github.workspace }}/.ccache
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        
+
+      - name: Checkout Git from PR cptpcrd for RBR50v2 Device Tree
+        run: |
+          git clone https://github.com/openwrt/openwrt.git
+          cp defconfig openwrt/.config
+          cd openwrt
+          git fetch origin pull/22321/head:pr-22321
+          git checkout pr-22321
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential clang flex bison gawk gettext \
+            git libncurses5-dev libssl-dev rsync unzip zlib1g-dev ccache
+
+      - name: Update & Install Feeds
+        run: |
+          cd openwrt
+          ./scripts/feeds update -a
+          ./scripts/feeds install -a
+
+      - name: Create ccache directory
+        run: |
+              mkdir -p ~/.ccache
+      - name: Setup ccache
+        run: |
+         mkdir -p $CCACHE_DIR
+         ccache -M 8G  # Set max size
+      - name: Cache ccache
+        uses: actions/cache@v4
+        with:
+         path: ${{ github.workspace }}/.ccache
+         key: ${{ runner.os }}-ccache-${{ github.sha }}
+         restore-keys: |
+          ${{ runner.os }}-ccache-
+    
+      
+      - name: Configure Target
+        env:
+            CCACHE_DIR: ${{ github.workspace }}/.ccache
+        run: |
+          cd openwrt
+          make defconfig
+
+      - name: Download Sources
+        env:
+            CCACHE_DIR: ${{ github.workspace }}/.ccache
+        run: cd openwrt && make download -j4
+
+      - name: Compile Firmware
+        env:
+          CCACHE_DIR: ${{ github.workspace }}/.ccache
+        run: cd openwrt && make -j$(nproc)
+
+
+      - name: Upload Firmware Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: openwrt-ipq40xx-generic-full-build
+          path: openwrt/bin/targets/ipq40xx/generic/
+          if-no-files-found: error
