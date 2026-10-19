@@ -30,44 +30,33 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y build-essential clang flex bison gawk gettext \
             git libncurses5-dev libssl-dev rsync unzip zlib1g-dev ccache
-
+      
       - name: Update & Install Feeds
         run: |
           cd openwrt
           ./scripts/feeds update -a
           ./scripts/feeds install -a
-
-      - name: Create ccache directory
-        run: |
-              mkdir -p ~/.ccache
       - name: Setup ccache
-        run: |
-         mkdir -p $CCACHE_DIR
-         ccache -M 8G  # Set max size
-      - name: Cache ccache
         uses: actions/cache@v4
         with:
-         path: ${{ github.workspace }}/.ccache
-         key: ${{ runner.os }}-ccache-${{ github.sha }}
-         restore-keys: |
-          ${{ runner.os }}-ccache-
-    
-      
-      - name: Configure Target
-        env:
-            CCACHE_DIR: ${{ github.workspace }}/.ccache
+          path: ~/.cache/ccache
+          key: ${{ runner.os }}-ccache-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-ccache-
+      - name: Zero ccache statistics
         run: |
+          ccache -M 2G # Sets maximum cache size to 2 GB
+          ccache -z    # Zeroes stats to track hit rate for this run
+      - name: Configure Target
+        run: |
+          export PATH="/usr/lib/ccache:$PATH"
           cd openwrt
           make defconfig
 
       - name: Download Sources
-        env:
-            CCACHE_DIR: ${{ github.workspace }}/.ccache
         run: cd openwrt && make download -j4
 
       - name: Compile Firmware
-        env:
-          CCACHE_DIR: ${{ github.workspace }}/.ccache
         run: cd openwrt && make -j$(nproc)
 
 
