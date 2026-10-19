@@ -8,8 +8,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-        CCACHE_DIR: ${{ github.workspace }}/.ccache
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
