@@ -60,6 +60,7 @@ jobs:
              cd openwrt
              export CCACHE_DIR="$HOME/.cache/ccache"
              make -j$(nproc)
+             ccache -s
 
 
       - name: Upload Firmware Artifacts
