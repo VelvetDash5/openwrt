@@ -20,8 +20,11 @@ jobs:
           git clone --single-branch --branch openwrt-25.12 https://github.com/openwrt/openwrt.git
           cp defconfig openwrt/.config
           cd openwrt
-          git fetch origin pull/22321/head:pr-22321
-          git checkout pr-22321
+          git fetch origin pull/167/head:firmware-pr
+          git remote add cptpcrd https://github.com/cptpcrd/openwrt.git
+          git fetch cptpcrd add-rbk50v2
+          git checkout -b pr-rbk50v2 cptpcrd/add-rbk50v2
+          GIT_SEQUENCE_EDITOR="true" git rebase -i --autosquash HEAD~6
       - name: Install Dependencies
         run: |
           sudo apt-get update
